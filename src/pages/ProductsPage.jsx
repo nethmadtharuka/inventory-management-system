@@ -10,10 +10,12 @@ import {
   updateProduct,
   deleteProduct,
   adjustStock,
+  deleteProductsBulk,
+  restockProductsBulk,
 } from "../utils/localStorage";
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] =useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
@@ -21,7 +23,14 @@ export default function ProductsPage() {
   const [stockFilter, setStockFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
 
+  // NEW
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const categories = getCategories();
+
+  useEffect(() => {
+    setProducts(getProducts());
+  }, []);
 
   const filteredProducts = products
     .filter((p) => categoryFilter === "All" || p.category === categoryFilter)
@@ -33,21 +42,19 @@ export default function ProductsPage() {
     .filter((p) => {
       const term = searchTerm.trim().toLowerCase();
       if (!term) return true;
+
       return (
         p.name.toLowerCase().includes(term) ||
         p.id.toLowerCase().includes(term)
       );
     });
 
-  useEffect(() => {
-    setProducts(getProducts());
-  }, []);
-
   function handleAdd(values) {
     const newProduct = {
-      id: crypto.randomUUID(), // TODO: swap for generateUniqueSKU() from Step 12
+      id: crypto.randomUUID(), // replace with generateUniqueSKU() later
       ...values,
     };
+
     const updated = addProduct(newProduct);
     setProducts(updated);
     setShowForm(false);
@@ -64,23 +71,72 @@ export default function ProductsPage() {
     if (window.confirm("Delete this product?")) {
       const updated = deleteProduct(id);
       setProducts(updated);
+
+      setSelectedIds((prev) => prev.filter((x) => x !== id));
     }
   }
 
   function handleStockChange(id, delta) {
     const { products: updated, error } = adjustStock(id, delta);
+
     if (error) {
       alert(error);
       return;
     }
+
+    setProducts(updated);
+  }
+
+  // ==========================
+  // Bulk selection
+  // ==========================
+
+  function toggleSelect(id) {
+    setSelectedIds((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : [...prev, id]
+    );
+  }
+
+  function toggleSelectAll() {
+    if (
+      filteredProducts.length > 0 &&
+      selectedIds.length === filteredProducts.length
+    ) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredProducts.map((p) => p.id));
+    }
+  }
+
+  function handleBulkDelete() {
+    if (selectedIds.length === 0) return;
+
+    if (
+      window.confirm(
+        `Delete ${selectedIds.length} selected product(s)?`
+      )
+    ) {
+      const updated = deleteProductsBulk(selectedIds);
+      setProducts(updated);
+      setSelectedIds([]);
+    }
+  }
+
+  function handleBulkRestock(delta) {
+    if (selectedIds.length === 0) return;
+
+    const updated = restockProductsBulk(selectedIds, delta);
     setProducts(updated);
   }
 
   return (
     <div className="p-6">
-      {/* Header row: title + action buttons only */}
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Products</h1>
+
         <div className="flex gap-2">
           <button
             onClick={() => downloadCSV(filteredProducts)}
@@ -88,6 +144,7 @@ export default function ProductsPage() {
           >
             Export CSV
           </button>
+
           <button
             onClick={() => {
               setEditingProduct(null);
@@ -100,13 +157,10 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* Dashboard stats, full width, own row */}
       <Dashboard products={products} />
 
-      {/* Chart, full width, own row */}
       <CategoryChart products={products} />
 
-      {/* Product Form */}
       {showForm && (
         <div className="mb-6 border rounded-lg p-4 shadow-sm">
           <ProductForm
@@ -121,6 +175,7 @@ export default function ProductsPage() {
       )}
 
       {/* Filters */}
+
       <div className="mb-4 flex flex-wrap gap-3">
         <select
           value={categoryFilter}
@@ -128,6 +183,7 @@ export default function ProductsPage() {
           className="border rounded px-3 py-2"
         >
           <option value="All">All Categories</option>
+
           {categories.map((c) => (
             <option key={c} value={c}>
               {c}
@@ -154,11 +210,47 @@ export default function ProductsPage() {
         />
       </div>
 
-      {/* Products Table */}
+      {/* Bulk Actions */}
+
+      {selectedIds.length > 0 && (
+        <div className="flex items-center gap-3 mb-3 p-3 bg-blue-50 border border-blue-200 rounded">
+          <span className="text-sm font-medium">
+            {selectedIds.length} selected
+          </span>
+
+          <button
+            onClick={() => handleBulkRestock(10)}
+            className="border px-3 py-1 rounded text-sm hover:bg-white"
+          >
+            +10 Stock
+          </button>
+
+          <button
+            onClick={handleBulkDelete}
+            className="border border-red-400 text-red-600 px-3 py-1 rounded text-sm hover:bg-white"
+          >
+            Delete Selected
+          </button>
+        </div>
+      )}
+
+      {/* Table */}
+
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border">
           <thead className="bg-gray-100">
             <tr>
+              <th className="border px-4 py-2 text-center">
+                <input
+                  type="checkbox"
+                  checked={
+                    filteredProducts.length > 0 &&
+                    selectedIds.length === filteredProducts.length
+                  }
+                  onChange={toggleSelectAll}
+                />
+              </th>
+
               <th className="border px-4 py-2 text-left">SKU</th>
               <th className="border px-4 py-2 text-left">Name</th>
               <th className="border px-4 py-2 text-left">Category</th>
@@ -167,20 +259,40 @@ export default function ProductsPage() {
               <th className="border px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {filteredProducts.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-6 text-gray-500">
+                <td
+                  colSpan={7}
+                  className="text-center py-6 text-gray-500"
+                >
                   No products found.
                 </td>
               </tr>
             ) : (
               filteredProducts.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="border px-4 py-2 font-mono text-sm">{p.id}</td>
+                  <td className="border px-4 py-2 text-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(p.id)}
+                      onChange={() => toggleSelect(p.id)}
+                    />
+                  </td>
+
+                  <td className="border px-4 py-2 font-mono text-sm">
+                    {p.id}
+                  </td>
+
                   <td className="border px-4 py-2">{p.name}</td>
+
                   <td className="border px-4 py-2">{p.category}</td>
-                  <td className="border px-4 py-2">{Number(p.price).toFixed(2)}</td>
+
+                  <td className="border px-4 py-2">
+                    {Number(p.price).toFixed(2)}
+                  </td>
+
                   <td className="border px-4 py-2">
                     <div className="flex items-center justify-center gap-2">
                       <button
@@ -189,9 +301,11 @@ export default function ProductsPage() {
                       >
                         −
                       </button>
+
                       <span className="font-medium min-w-[20px] text-center">
                         {p.stock}
                       </span>
+
                       <button
                         onClick={() => handleStockChange(p.id, 1)}
                         className="border rounded w-7 h-7 hover:bg-gray-200"
@@ -200,6 +314,7 @@ export default function ProductsPage() {
                       </button>
                     </div>
                   </td>
+
                   <td className="border px-4 py-2 text-center">
                     <button
                       onClick={() => {
@@ -210,6 +325,7 @@ export default function ProductsPage() {
                     >
                       Edit
                     </button>
+
                     <button
                       onClick={() => handleDelete(p.id)}
                       className="text-red-600 hover:underline"

@@ -186,3 +186,26 @@ export function addCategory(name) {
 
   return updated;
 }
+
+// Delete multiple products by their ids
+export function deleteProductsBulk(ids) {
+  const products = getProducts();
+  const updated = products.filter((p) => !ids.includes(p.id));
+  saveProducts(updated);
+  return updated;
+}
+
+// Restock multiple products by the same delta amount
+export function restockProductsBulk(ids, delta) {
+  const products = getProducts();
+  const updated = products.map((p) => {
+    if (!ids.includes(p.id)) return p;
+    const newStock = Math.max(0, p.stock + delta); // never below zero
+    if (newStock !== p.stock) {
+      logStockChange(p.id, p.name, newStock - p.stock, newStock); // reuse Step 13's logger
+    }
+    return { ...p, stock: newStock };
+  });
+  saveProducts(updated);
+  return updated;
+}
