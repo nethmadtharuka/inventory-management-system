@@ -50,8 +50,8 @@ npm run dev
 
 ## Live Demo
 
-inventory-management-system-4nzltmec1-nethmadtharuka1.vercel.app
-
+[inventory-management-system-4nzltmec1-nethmadtharuka1.vercel.app
+](https://inventory-management-system-4nzltmec1-nethmadtharuka1.vercel.app)
 ## Screenshots
 
 Inside the folder
