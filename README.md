@@ -50,7 +50,7 @@ npm run dev
 
 ## Live Demo
 
-[Add your Netlify/Vercel link here once deployed]
+inventory-management-system-4nzltmec1-nethmadtharuka1.vercel.app
 
 ## Screenshots
 
