@@ -58,3 +58,24 @@ export function adjustStock(id, delta) {
   saveProducts(updated);
   return { products: updated, error: null };
 }
+
+const CATEGORY_KEY = "inventory_categories";
+
+// Get all categories (with sensible defaults on first run)
+export function getCategories() {
+  const data = localStorage.getItem(CATEGORY_KEY);
+  if (data) return JSON.parse(data);
+  const defaults = ["General"];
+  localStorage.setItem(CATEGORY_KEY, JSON.stringify(defaults));
+  return defaults;
+}
+
+
+// Add a new custom category (no duplicates)
+export function addCategory(name) {
+  const categories = getCategories();
+  if (categories.includes(name)) return categories;
+  const updated = [...categories, name];
+  localStorage.setItem(CATEGORY_KEY, JSON.stringify(updated));
+  return updated;
+}

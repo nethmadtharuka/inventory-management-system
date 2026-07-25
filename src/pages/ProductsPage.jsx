@@ -3,6 +3,7 @@ import Dashboard from "./Dashboard";
 import ProductForm from "../components/ProductForm";
 import {
   getProducts,
+  getCategories,
   addProduct,
   updateProduct,
   deleteProduct,
@@ -14,12 +15,24 @@ export default function ProductsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  // Load products on first render
+  // Category Filter
+  const [categoryFilter, setCategoryFilter] = useState("All");
+
+  // Get categories
+  const categories = getCategories();
+
+  // Filtered products
+  const filteredProducts =
+    categoryFilter === "All"
+      ? products
+      : products.filter((p) => p.category === categoryFilter);
+
+  // Load products
   useEffect(() => {
     setProducts(getProducts());
   }, []);
 
-  // Add new product
+  // Add product
   function handleAdd(values) {
     const newProduct = {
       id: crypto.randomUUID(),
@@ -31,7 +44,7 @@ export default function ProductsPage() {
     setShowForm(false);
   }
 
-  // Update existing product
+  // Update product
   function handleUpdate(values) {
     const updated = updateProduct(editingProduct.id, values);
     setProducts(updated);
@@ -92,6 +105,23 @@ export default function ProductsPage() {
         </div>
       )}
 
+      {/* Category Filter */}
+      <div className="mb-4">
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="border rounded px-3 py-2"
+        >
+          <option value="All">All Categories</option>
+
+          {categories.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Products Table */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border">
@@ -106,17 +136,17 @@ export default function ProductsPage() {
           </thead>
 
           <tbody>
-            {products.length === 0 ? (
+            {filteredProducts.length === 0 ? (
               <tr>
                 <td
                   colSpan={5}
                   className="text-center py-6 text-gray-500"
                 >
-                  No products yet.
+                  No products found.
                 </td>
               </tr>
             ) : (
-              products.map((p) => (
+              filteredProducts.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50">
                   <td className="border px-4 py-2">{p.name}</td>
 
