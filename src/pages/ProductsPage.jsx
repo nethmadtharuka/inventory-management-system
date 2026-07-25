@@ -15,17 +15,36 @@ export default function ProductsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  // Category Filter
+  // Filters
   const [categoryFilter, setCategoryFilter] = useState("All");
+  const [stockFilter, setStockFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Get categories
+  // Categories
   const categories = getCategories();
 
-  // Filtered products
-  const filteredProducts =
-    categoryFilter === "All"
-      ? products
-      : products.filter((p) => p.category === categoryFilter);
+  // Combined filtering
+  const filteredProducts = products
+    .filter(
+      (p) =>
+        categoryFilter === "All" ||
+        p.category === categoryFilter
+    )
+    .filter((p) => {
+      if (stockFilter === "InStock") return p.stock > 0;
+      if (stockFilter === "OutOfStock") return p.stock === 0;
+      return true;
+    })
+    .filter((p) => {
+      const term = searchTerm.trim().toLowerCase();
+
+      if (!term) return true;
+
+      return (
+        p.name.toLowerCase().includes(term) ||
+        p.id.toLowerCase().includes(term)
+      );
+    });
 
   // Load products
   useEffect(() => {
@@ -60,7 +79,7 @@ export default function ProductsPage() {
     }
   }
 
-  // Increase / Decrease stock
+  // Stock adjustment
   function handleStockChange(id, delta) {
     const { products: updated, error } = adjustStock(id, delta);
 
@@ -76,9 +95,11 @@ export default function ProductsPage() {
     <div className="p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Products</h1>
+        <h1 className="text-2xl font-bold">
+          Products
+        </h1>
 
-        <Dashboard products={products} />
+        <Dashboard products={filteredProducts} />
 
         <button
           onClick={() => {
@@ -96,7 +117,11 @@ export default function ProductsPage() {
         <div className="mb-6 border rounded-lg p-4 shadow-sm">
           <ProductForm
             initialProduct={editingProduct}
-            onSubmit={editingProduct ? handleUpdate : handleAdd}
+            onSubmit={
+              editingProduct
+                ? handleUpdate
+                : handleAdd
+            }
             onCancel={() => {
               setShowForm(false);
               setEditingProduct(null);
@@ -105,14 +130,19 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Category Filter */}
-      <div className="mb-4">
+      {/* Filters */}
+      <div className="mb-4 flex flex-wrap gap-3">
+        {/* Category */}
         <select
           value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
+          onChange={(e) =>
+            setCategoryFilter(e.target.value)
+          }
           className="border rounded px-3 py-2"
         >
-          <option value="All">All Categories</option>
+          <option value="All">
+            All Categories
+          </option>
 
           {categories.map((c) => (
             <option key={c} value={c}>
@@ -120,6 +150,36 @@ export default function ProductsPage() {
             </option>
           ))}
         </select>
+
+        {/* Stock */}
+        <select
+          value={stockFilter}
+          onChange={(e) =>
+            setStockFilter(e.target.value)
+          }
+          className="border rounded px-3 py-2"
+        >
+          <option value="All">
+            All Stock
+          </option>
+          <option value="InStock">
+            In Stock
+          </option>
+          <option value="OutOfStock">
+            Out of Stock
+          </option>
+        </select>
+
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search by name or ID..."
+          value={searchTerm}
+          onChange={(e) =>
+            setSearchTerm(e.target.value)
+          }
+          className="border rounded px-3 py-2 flex-1 min-w-[200px]"
+        />
       </div>
 
       {/* Products Table */}
@@ -127,11 +187,21 @@ export default function ProductsPage() {
         <table className="w-full border-collapse border">
           <thead className="bg-gray-100">
             <tr>
-              <th className="border px-4 py-2 text-left">Name</th>
-              <th className="border px-4 py-2 text-left">Category</th>
-              <th className="border px-4 py-2 text-left">Price</th>
-              <th className="border px-4 py-2 text-center">Stock</th>
-              <th className="border px-4 py-2 text-center">Actions</th>
+              <th className="border px-4 py-2 text-left">
+                Name
+              </th>
+              <th className="border px-4 py-2 text-left">
+                Category
+              </th>
+              <th className="border px-4 py-2 text-left">
+                Price
+              </th>
+              <th className="border px-4 py-2 text-center">
+                Stock
+              </th>
+              <th className="border px-4 py-2 text-center">
+                Actions
+              </th>
             </tr>
           </thead>
 
@@ -147,20 +217,32 @@ export default function ProductsPage() {
               </tr>
             ) : (
               filteredProducts.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="border px-4 py-2">{p.name}</td>
-
-                  <td className="border px-4 py-2">{p.category}</td>
+                <tr
+                  key={p.id}
+                  className="hover:bg-gray-50"
+                >
+                  <td className="border px-4 py-2">
+                    {p.name}
+                  </td>
 
                   <td className="border px-4 py-2">
+                    {p.category}
+                  </td>
+
+                  <td className="border px-4 py-2">
+                    Rs.{" "}
                     {Number(p.price).toFixed(2)}
                   </td>
 
-                  {/* Stock Controls */}
                   <td className="border px-4 py-2">
                     <div className="flex items-center justify-center gap-2">
                       <button
-                        onClick={() => handleStockChange(p.id, -1)}
+                        onClick={() =>
+                          handleStockChange(
+                            p.id,
+                            -1
+                          )
+                        }
                         className="border rounded w-7 h-7 hover:bg-gray-200"
                       >
                         −
@@ -171,7 +253,12 @@ export default function ProductsPage() {
                       </span>
 
                       <button
-                        onClick={() => handleStockChange(p.id, 1)}
+                        onClick={() =>
+                          handleStockChange(
+                            p.id,
+                            1
+                          )
+                        }
                         className="border rounded w-7 h-7 hover:bg-gray-200"
                       >
                         +
@@ -179,7 +266,6 @@ export default function ProductsPage() {
                     </div>
                   </td>
 
-                  {/* Actions */}
                   <td className="border px-4 py-2 text-center">
                     <button
                       onClick={() => {
@@ -192,7 +278,9 @@ export default function ProductsPage() {
                     </button>
 
                     <button
-                      onClick={() => handleDelete(p.id)}
+                      onClick={() =>
+                        handleDelete(p.id)
+                      }
                       className="text-red-600 hover:underline"
                     >
                       Delete
