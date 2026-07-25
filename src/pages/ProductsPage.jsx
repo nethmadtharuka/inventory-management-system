@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Dashboard from "./Dashboard";
 import ProductForm from "../components/ProductForm";
+import { downloadCSV } from "../utils/csv";
 import {
   getProducts,
   getCategories,
@@ -10,6 +11,8 @@ import {
   adjustStock,
   generateUniqueSKU,
 } from "../utils/localStorage";
+
+
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -100,15 +103,24 @@ export default function ProductsPage() {
 
         <Dashboard products={filteredProducts} />
 
-        <button
-          onClick={() => {
-            setEditingProduct(null);
-            setShowForm(true);
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-        >
-          + Add Product
-        </button>
+<div className="flex gap-2">
+  <button
+    onClick={() => downloadCSV(filteredProducts)}
+    className="border border-gray-400 px-4 py-2 rounded hover:bg-gray-100"
+  >
+    Export CSV
+  </button>
+
+  <button
+    onClick={() => {
+      setEditingProduct(null);
+      setShowForm(true);
+    }}
+    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+  >
+    + Add Product
+  </button>
+</div>
       </div>
 
       {/* Product Form */}
