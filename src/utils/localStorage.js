@@ -2,6 +2,11 @@ import { generateSKU } from "./sku";
 
 const STORAGE_KEY = "inventory_products";
 const CATEGORY_KEY = "inventory_categories";
+const HISTORY_KEY = "inventory_stock_history";
+
+// =========================
+// Products
+// =========================
 
 // Get all products
 export function getProducts() {
@@ -9,12 +14,12 @@ export function getProducts() {
   return data ? JSON.parse(data) : [];
 }
 
-// Save the full products array (overwrite)
+// Save all products
 export function saveProducts(products) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
 }
 
-// Generate a SKU guaranteed not to collide with existing products
+// Generate a SKU guaranteed not to collide
 export function generateUniqueSKU() {
   const products = getProducts();
   const existingIds = new Set(products.map((p) => p.id));
@@ -28,7 +33,7 @@ export function generateUniqueSKU() {
   return sku;
 }
 
-// Add a single product
+// Add product
 export function addProduct(product) {
   const products = getProducts();
   products.push(product);
@@ -36,32 +41,73 @@ export function addProduct(product) {
   return products;
 }
 
-// Update a single product by id
+// Update product
 export function updateProduct(id, updatedFields) {
   const products = getProducts();
 
   const updated = products.map((p) =>
-    p.id === id ? { ...p, ...updatedFields } : p
+    p.id === id
+      ? { ...p, ...updatedFields }
+      : p
   );
 
   saveProducts(updated);
   return updated;
 }
 
-// Delete a single product
+// Delete product
 export function deleteProduct(id) {
   const products = getProducts();
 
-  const updated = products.filter((p) => p.id !== id);
+  const updated = products.filter(
+    (p) => p.id !== id
+  );
 
   saveProducts(updated);
   return updated;
 }
 
+// =========================
+// Stock History
+// =========================
+
+// Get all stock history entries
+export function getStockHistory() {
+  const data = localStorage.getItem(HISTORY_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+// Internal helper to log stock changes
+function logStockChange(
+  productId,
+  productName,
+  delta,
+  newStock
+) {
+  const history = getStockHistory();
+
+  const entry = {
+    productId,
+    productName,
+    delta,
+    newStock,
+    timestamp: new Date().toISOString(),
+  };
+
+  const updated = [entry, ...history];
+
+  localStorage.setItem(
+    HISTORY_KEY,
+    JSON.stringify(updated)
+  );
+}
+
 // Adjust stock
 export function adjustStock(id, delta) {
   const products = getProducts();
-  const product = products.find((p) => p.id === id);
+  const product = products.find(
+    (p) => p.id === id
+  );
 
   if (!product) {
     return {
@@ -87,17 +133,31 @@ export function adjustStock(id, delta) {
 
   saveProducts(updated);
 
+  // Log stock movement
+  logStockChange(
+    product.id,
+    product.name,
+    delta,
+    newStock
+  );
+
   return {
     products: updated,
     error: null,
   };
 }
 
+// =========================
+// Categories
+// =========================
+
 // Get all categories
 export function getCategories() {
   const data = localStorage.getItem(CATEGORY_KEY);
 
-  if (data) return JSON.parse(data);
+  if (data) {
+    return JSON.parse(data);
+  }
 
   const defaults = ["General"];
 
@@ -109,7 +169,7 @@ export function getCategories() {
   return defaults;
 }
 
-// Add a new custom category
+// Add custom category
 export function addCategory(name) {
   const categories = getCategories();
 
