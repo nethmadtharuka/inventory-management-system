@@ -1,20 +1,67 @@
-<<<<<<< HEAD
-# React + Vite
+# Inventory Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A frontend-only Inventory Management System built for [Company Name]'s Development Intern take-home task. Manages products, tracks stock levels, and provides inventory analytics — all data persisted locally via `localStorage`, no backend required.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Core Features
+- **Product Management** — add, edit, and delete products (name, SKU, category, price, stock)
+- **Stock Management** — increase/decrease stock with validation preventing negative stock
+- **Dashboard** — total product count and total inventory value at a glance
+- **Category Handling** — create custom categories, filter products by category, per-category product counts
+- **Search & Filter** — search by product name or SKU, filter by category and stock status (In Stock / Out of Stock)
+- **Form Validation** — all forms built with Formik + Yup, with inline error messages
 
-## React Compiler
+### Bonus Features
+- **Auto-generated SKU** — unique product IDs generated in the format `PRD482910`
+- **Stock History Log** — every stock change is recorded with a timestamp
+- **CSV Export** — download the current (filtered) product list as a `.csv` file
+- **Analytics Chart** — bar chart showing total stock by category
+- **Bulk Actions** — select multiple products to bulk-restock or bulk-delete
+- **Dark Mode** — theme toggle, preference saved in `localStorage`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React (Vite)
+- Formik + Yup — form handling and validation
+- Tailwind CSS — styling
+- Recharts — analytics chart
+- localStorage — data persistence (no backend/database)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# inventory-management-system
->>>>>>> 71101641459ada38e95b0b7ca5c8b14acf68c460
+## Running Locally
+
+1. Clone the repository:
+```bash
+git clone https://github.com/nethmadtharuka/inventory-management-system.git
+cd inventory-management-system
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Open the URL shown in the terminal (typically `http://localhost:5173`)
+
+## Live Demo
+
+[Add your Netlify/Vercel link here once deployed]
+
+## Screenshots
+
+Inside the folder
+
+## Project Structure
+
+```
+src/
+components/ → reusable UI pieces (ProductForm, StatCard, CategoryChart)
+pages/ → ProductsPage, Dashboard, StockHistoryPage
+utils/ → localStorage.js, sku.js, csv.js, theme.js
+validation/ → productSchema.js (Yup)
+```
