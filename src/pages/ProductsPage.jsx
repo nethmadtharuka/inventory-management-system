@@ -1,70 +1,141 @@
 import { useState, useEffect } from "react";
 import ProductForm from "../components/ProductForm";
-import { getProducts, addProduct } from "../utils/localStorage";
+import {
+  getProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} from "../utils/localStorage";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
-  // Load products from localStorage once, on mount
+  // Load products on first render
   useEffect(() => {
     setProducts(getProducts());
   }, []);
 
+  // Add new product
   function handleAdd(values) {
     const newProduct = {
-      id: crypto.randomUUID(), // temporary ID — we'll replace with SKU generator later
+      id: crypto.randomUUID(),
       ...values,
     };
+
     const updated = addProduct(newProduct);
     setProducts(updated);
     setShowForm(false);
   }
 
+  // Update existing product
+  function handleUpdate(values) {
+    const updated = updateProduct(editingProduct.id, values);
+    setProducts(updated);
+    setEditingProduct(null);
+    setShowForm(false);
+  }
+
+  // Delete product
+  function handleDelete(id) {
+    if (window.confirm("Delete this product?")) {
+      const updated = deleteProduct(id);
+      setProducts(updated);
+    }
+  }
+
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-semibold">Products</h1>
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Products</h1>
+
         <button
-          onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={() => {
+            setEditingProduct(null);
+            setShowForm(true);
+          }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
         >
           + Add Product
         </button>
       </div>
 
+      {/* Product Form */}
       {showForm && (
-        <div className="mb-6 border rounded p-4">
-          <ProductForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />
+        <div className="mb-6 border rounded-lg p-4 shadow-sm">
+          <ProductForm
+            initialProduct={editingProduct}
+            onSubmit={editingProduct ? handleUpdate : handleAdd}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingProduct(null);
+            }}
+          />
         </div>
       )}
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="text-left border-b">
-            <th className="py-2">Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Stock</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.length === 0 ? (
+      {/* Products Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border">
+          <thead className="bg-gray-100">
             <tr>
-              <td colSpan={4} className="py-4 text-gray-500">No products yet.</td>
+              <th className="border px-4 py-2 text-left">Name</th>
+              <th className="border px-4 py-2 text-left">Category</th>
+              <th className="border px-4 py-2 text-left">Price</th>
+              <th className="border px-4 py-2 text-left">Stock</th>
+              <th className="border px-4 py-2 text-center">Actions</th>
             </tr>
-          ) : (
-            products.map((p) => (
-              <tr key={p.id} className="border-b">
-                <td className="py-2">{p.name}</td>
-                <td>{p.category}</td>
-                <td>{p.price.toFixed(2)}</td>
-                <td>{p.stock}</td>
+          </thead>
+
+          <tbody>
+            {products.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="text-center py-6 text-gray-500"
+                >
+                  No products yet.
+                </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              products.map((p) => (
+                <tr key={p.id} className="hover:bg-gray-50">
+                  <td className="border px-4 py-2">{p.name}</td>
+
+                  <td className="border px-4 py-2">{p.category}</td>
+
+                  <td className="border px-4 py-2">
+                    {Number(p.price).toFixed(2)}
+                  </td>
+
+                  <td className="border px-4 py-2">{p.stock}</td>
+
+                  <td className="border px-4 py-2 text-center">
+                    <button
+                      onClick={() => {
+                        setEditingProduct(p);
+                        setShowForm(true);
+                      }}
+                      className="text-blue-600 hover:underline mr-4"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(p.id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

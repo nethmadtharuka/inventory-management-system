@@ -18,3 +18,21 @@ export function addProduct(product) {
   saveProducts(products);
   return products;
 }
+
+// Update a single product by id
+export function updateProduct(id, updatedFields) {
+  const products = getProducts();
+  const updated = products.map((p) =>
+    p.id === id ? { ...p, ...updatedFields } : p
+  );
+  saveProducts(updated);
+  return updated;
+}
+
+// Delete a product by id
+export function deleteProduct(id) {
+  const products = getProducts();
+  const updated = products.filter((p) => p.id !== id);
+  saveProducts(updated);
+  return updated;
+}
