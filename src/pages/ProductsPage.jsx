@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Dashboard from "./Dashboard";
 import ProductForm from "../components/ProductForm";
 import {
   getProducts,
@@ -63,6 +64,8 @@ export default function ProductsPage() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Products</h1>
+
+        <Dashboard products={products} />
 
         <button
           onClick={() => {
