@@ -36,3 +36,25 @@ export function deleteProduct(id) {
   saveProducts(updated);
   return updated;
 }
+
+// Adjust stock by a delta (positive to increase, negative to decrease)
+// Returns { products, error } - error is set if the change is invalid
+export function adjustStock(id, delta) {
+  const products = getProducts();
+  const product = products.find((p) => p.id === id);
+
+  if (!product) {
+    return { products, error: "Product not found" };
+  }
+
+  const newStock = product.stock + delta;
+  if (newStock < 0) {
+    return { products, error: "Stock cannot go below zero" };
+  }
+
+  const updated = products.map((p) =>
+    p.id === id ? { ...p, stock: newStock } : p
+  );
+  saveProducts(updated);
+  return { products: updated, error: null };
+}

@@ -5,6 +5,7 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  adjustStock,
 } from "../utils/localStorage";
 
 export default function ProductsPage() {
@@ -43,6 +44,18 @@ export default function ProductsPage() {
       const updated = deleteProduct(id);
       setProducts(updated);
     }
+  }
+
+  // Increase / Decrease stock
+  function handleStockChange(id, delta) {
+    const { products: updated, error } = adjustStock(id, delta);
+
+    if (error) {
+      alert(error);
+      return;
+    }
+
+    setProducts(updated);
   }
 
   return (
@@ -84,7 +97,7 @@ export default function ProductsPage() {
               <th className="border px-4 py-2 text-left">Name</th>
               <th className="border px-4 py-2 text-left">Category</th>
               <th className="border px-4 py-2 text-left">Price</th>
-              <th className="border px-4 py-2 text-left">Stock</th>
+              <th className="border px-4 py-2 text-center">Stock</th>
               <th className="border px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
@@ -110,8 +123,30 @@ export default function ProductsPage() {
                     {Number(p.price).toFixed(2)}
                   </td>
 
-                  <td className="border px-4 py-2">{p.stock}</td>
+                  {/* Stock Controls */}
+                  <td className="border px-4 py-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => handleStockChange(p.id, -1)}
+                        className="border rounded w-7 h-7 hover:bg-gray-200"
+                      >
+                        −
+                      </button>
 
+                      <span className="font-medium min-w-[20px] text-center">
+                        {p.stock}
+                      </span>
+
+                      <button
+                        onClick={() => handleStockChange(p.id, 1)}
+                        className="border rounded w-7 h-7 hover:bg-gray-200"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </td>
+
+                  {/* Actions */}
                   <td className="border px-4 py-2 text-center">
                     <button
                       onClick={() => {
