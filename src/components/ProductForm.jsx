@@ -36,16 +36,17 @@ export default function ProductForm({
     >
       {/* Product Name */}
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
           Product Name
         </label>
+
         <input
           name="name"
           type="text"
           value={formik.values.name}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         {formik.touched.name && formik.errors.name && (
@@ -57,7 +58,7 @@ export default function ProductForm({
 
       {/* Category */}
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
           Category
         </label>
 
@@ -66,7 +67,7 @@ export default function ProductForm({
           value={formik.values.category}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select a category</option>
 
@@ -89,7 +90,7 @@ export default function ProductForm({
             placeholder="New category name"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
-            className="border rounded px-2 py-1 text-sm flex-1"
+            className="flex-1 border dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <button
@@ -106,7 +107,7 @@ export default function ProductForm({
               );
               setNewCategory("");
             }}
-            className="border px-3 py-1 rounded text-sm"
+            className="border dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-1 rounded text-sm transition-colors"
           >
             + Add
           </button>
@@ -115,7 +116,7 @@ export default function ProductForm({
 
       {/* Price */}
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
           Price
         </label>
 
@@ -126,7 +127,7 @@ export default function ProductForm({
           value={formik.values.price}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         {formik.touched.price && formik.errors.price && (
@@ -138,7 +139,7 @@ export default function ProductForm({
 
       {/* Stock */}
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
           Stock Quantity
         </label>
 
@@ -148,7 +149,7 @@ export default function ProductForm({
           value={formik.values.stock}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         {formik.touched.stock && formik.errors.stock && (
@@ -162,7 +163,7 @@ export default function ProductForm({
       <div className="flex gap-2 mt-2">
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors"
         >
           {initialProduct ? "Update Product" : "Add Product"}
         </button>
@@ -171,7 +172,7 @@ export default function ProductForm({
           <button
             type="button"
             onClick={onCancel}
-            className="border px-4 py-2 rounded"
+            className="border dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded transition-colors"
           >
             Cancel
           </button>
