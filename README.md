@@ -1,6 +1,6 @@
 # Inventory Management System
 
-A frontend-only Inventory Management System built for [Company Name]'s Development Intern take-home task. Manages products, tracks stock levels, and provides inventory analytics — all data persisted locally via `localStorage`, no backend required.
+A frontend-only Inventory Management System built for Development Intern take-home task. Manages products, tracks stock levels, and provides inventory analytics — all data persisted locally via `localStorage`, no backend required.
 
 ## Features
 
