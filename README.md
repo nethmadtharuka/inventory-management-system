@@ -49,9 +49,7 @@ npm run dev
 4. Open the URL shown in the terminal (typically `http://localhost:5173`)
 
 ## Live Demo
-
-[inventory-management-system-4nzltmec1-nethmadtharuka1.vercel.app
-](https://inventory-management-system-4nzltmec1-nethmadtharuka1.vercel.app)
+https://inventory-management-system-rho-hazel.vercel.app
 ## Screenshots
 
 Inside the folder
