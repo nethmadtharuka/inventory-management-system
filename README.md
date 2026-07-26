@@ -31,35 +31,44 @@ A frontend-only Inventory Management System built for [Company Name]'s Developme
 ## Running Locally
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/nethmadtharuka/inventory-management-system.git
 cd inventory-management-system
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Start the development server:
+
 ```bash
 npm run dev
 ```
 
-4. Open the URL shown in the terminal (typically `http://localhost:5173`)
+4. Open the URL shown in the terminal (typically `http://localhost:5173`).
 
 ## Live Demo
-https://inventory-management-system-rho-hazel.vercel.app
+🔗 https://inventory-management-system-rho-hazel.vercel.app
+
+## Live Demonstration Video
+ https://1drv.ms/v/c/904e5b08909e59e9/IQCwQbOLeqQnTq3Z6lrhyObvAVY4SjlnvUdodAWzRzuqJ9c?e=SHEPvy
+
+A 2–3 minute screen recording demonstrating the application's functionality, including product management, stock updates, dashboard analytics, category management, search/filtering, CSV export, bulk actions, and dark mode.
+
 ## Screenshots
 
-Inside the folder
+Screenshots are available in the `screenshots/` folder.
 
 ## Project Structure
 
 ```
 src/
-components/ → reusable UI pieces (ProductForm, StatCard, CategoryChart)
-pages/ → ProductsPage, Dashboard, StockHistoryPage
-utils/ → localStorage.js, sku.js, csv.js, theme.js
-validation/ → productSchema.js (Yup)
+├── components/      # Reusable UI components (ProductForm, StatCard, CategoryChart)
+├── pages/           # Dashboard, ProductsPage, StockHistoryPage
+├── utils/           # localStorage.js, sku.js, csv.js, theme.js
+├── validation/      # productSchema.js (Yup)
 ```
